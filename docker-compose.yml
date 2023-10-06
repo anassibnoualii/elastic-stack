@@ -1,0 +1,35 @@
+version: '3.8'
+
+services:
+
+  elasticsearch:
+    image: elasticsearch:8.10.2
+    container_name: elasticsearch
+    environment:
+      - cluster.name=es-docker-cluster
+      - node.name=es-node
+      - discovery.type=single-node
+      - xpack.security.enabled=false
+    volumes:
+      - es_data:/usr/share/elasticsearch/data
+    ports:
+      - target: 9200
+        published: 9200
+  kibana:
+    image: kibana:8.10.2
+    container_name: kibana
+    environment:
+      - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
+    ports:
+      - target: 5601
+        published: 5601
+    depends_on:
+      - elasticsearch
+
+volumes:
+  es_data:
+    driver: local
+
+networks:
+  default:
+    name: elastic
